@@ -26,69 +26,78 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import exceptions.AuthenticationException;
 import exceptions.GenericExceptionMapper;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import javax.ws.rs.GET;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import utils.SetupTestUsers;
 
 @Path("login")
-public class LoginEndpoint
-{
+public class LoginEndpoint {
+
+    @GET
+    @Path("init")
+    public Response init() throws IOException, MalformedURLException {
+
+        try {
+            SetupTestUsers.dbInit();
+        } catch (Exception e) {
+            return Response.status(Response.Status.NOT_MODIFIED).build();
+        }
+
+        return Response.ok().build();
+
+    }
 
     public static final int TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //30 min
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(String jsonString) throws AuthenticationException
-    {
+    public Response login(String jsonString) throws AuthenticationException {
 
         JsonObject json = new JsonParser().parse(jsonString).getAsJsonObject();
         String username = json.get("username").getAsString();
         String password = json.get("password").getAsString();
 
         //Todo refactor into facade
-        try
-        {
+        try {
             User user = UserFacade.getInstance().getVeryfiedUser(username, password);
             String token = createToken(username, user.getRolesAsStrings());
 
             //old JsonObject responseJson = new JsonObject();
-            
             //old responseJson.addProperty("username", username);
             //old responseJson.addProperty("token", token);
-            
             //old return Response.ok(new Gson().toJson(responseJson)).build();
-            
             JSONObject responseJson2 = new JSONObject();
             JSONArray jsonRoleArray = new JSONArray();
-            
-            for(Role role :user.getRoleList()){
+
+            for (Role role : user.getRoleList()) {
                 jsonRoleArray.add(role.getRoleName());
             }
 
             responseJson2.put("username", username);
             responseJson2.put("token", token);
             responseJson2.put("roles", jsonRoleArray);
-            
+
             return Response.ok(new Gson().toJson(responseJson2)).build();
-            
-            
-        } catch (Exception ex)
-        {
-            if (ex instanceof AuthenticationException)
-            {
+
+        } catch (Exception ex) {
+            if (ex instanceof AuthenticationException) {
                 throw (AuthenticationException) ex;
+
             }
-            Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenericExceptionMapper.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         throw new AuthenticationException("Invalid username or password! Please try again");
     }
 
-    private String createToken(String userName, List<String> roles) throws JOSEException
-    {
+    private String createToken(String userName, List<String> roles) throws JOSEException {
 
         StringBuilder res = new StringBuilder();
-        for (String string : roles)
-        {
+        for (String string : roles) {
             res.append(string);
             res.append(",");
         }
