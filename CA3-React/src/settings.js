@@ -1,1 +1,1 @@
-export default "http://localhost:8080/bob/api/"
+export default "https://stephandjurhuus.com/CA3-Backend/api/"
