@@ -4,7 +4,8 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-const URL = "http://localhost:8080/bob/api/people"
+import baseURL from "../settings"
+const URL = baseURL + "people"
 
 export default class App extends React.Component {
     state = { names: [], sizePerPage: 10, page: 1, totalSize: 420 }

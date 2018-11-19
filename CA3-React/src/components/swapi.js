@@ -4,8 +4,9 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import baseURL from "../settings"
 
-const URL = "http://localhost:8080/bob/api/swapi/async/amount/5";
+const URL = baseURL + "swapi/async/amount/5";
 
 export default class swapi extends React.Component {
     constructor(props) {
